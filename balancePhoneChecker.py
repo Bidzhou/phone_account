@@ -24,8 +24,8 @@ def account_mts(login, password):
         driver.find_element(By.XPATH, mts_input_login).send_keys(login)
         driver.find_element(By.XPATH, mts_next_button).click()
         driver.find_element(By.XPATH, mts_input_password).send_keys(password)
-        driver.find_element(By.XPATH, mts_next_button)
-        if not (ec.presence_of_element_located((By.XPATH, mts_balance))):
+        driver.find_element(By.XPATH, mts_next_button).click()
+        if len(driver.find_elements((By.XPATH, mts_balance))) < 0:
             balance = 'Произошла ошибка, не удалось узнать баланс'
         else:
             balance = (driver.find_element(By.XPATH, mts_balance).text)
@@ -49,16 +49,16 @@ def account_megaphone(login, password):
         driver.find_element(By.XPATH, megaphone_login_input).send_keys(login)
         driver.find_element(By.XPATH, megaphone_password_input).send_keys(password)
         driver.find_element(By.XPATH, megaphone_enter_button).click()
-        if ec.presence_of_element_located((By.XPATH, megaphone_captcha_input)):
+        if len(driver.find_elements((By.XPATH, megaphone_captcha_input))) > 0:
             beepy.beep()
             input("Пройдите капчу и введите 'Enter' в консоль")
             driver.find_element(By.XPATH, megaphone_login_input).send_keys(login)
             driver.find_element(By.XPATH, megaphone_password_input).send_keys(password)
             driver.find_element(By.XPATH, megaphone_enter_button).click()
-        if not (ec.presence_of_element_located((By.XPATH,megaphone_balance))):
+        if len(driver.find_elements((By.XPATH, megaphone_balance))) < 0:
             balance = 'Произошла ошибка, не удалось узнать баланс'
         else:
-            balance = (driver.find_element(By.XPATH,megaphone_balance).text)
+            balance = driver.find_element(By.XPATH,megaphone_balance).text
             driver.find_element(By.XPATH, megaphone_profile_button).click()
             driver.find_element(By.XPATH, megaphone_exit_button).click()
     except Exception as ex:
@@ -75,9 +75,8 @@ def account_beeline(login, password):
     balance = 0
     try:
         driver.get(beeline_url)
-        WebDriverWait(driver, 5).until(
-            ec.presence_of_element_located((By.XPATH, beeline_authorization1_button)))
-        if not ec.presence_of_element_located((By.XPATH, beeline_authorization1_button)):
+        driver.implicitly_wait(5)
+        if len(driver.find_elements((By.XPATH, beeline_authorization1_button))) < 0:
             driver.find_element(By.XPATH, beeline_authorization2_button).click()
             driver.find_element(By.XPATH, beeline_login2_input).send_keys(login)
             driver.find_element(By.XPATH, beeline_password2_input).send_keys(password)
@@ -86,13 +85,14 @@ def account_beeline(login, password):
             driver.find_element(By.XPATH, beeline_login1_input).send_keys(login)
             driver.find_element(By.XPATH, beeline_password1_input).send_keys(password)
         driver.find_element(By.XPATH, beeline_enter_button).click()
-        if ((ec.presence_of_element_located((By.XPATH, beeline_captcha_input))) or (ec.presence_of_element_located((By.XPATH, beeline_captcha_pic)))):
+        if len(driver.find_elements((By.XPATH, beeline_captcha_input))) > 0 or len(driver.find_elements((By.XPATH, beeline_captcha_pic))) > 0:
             beepy.beep()
             input("Пройдите капчу и введите 'Enter' в консоль")
-        if not (ec.presence_of_element_located((By.XPATH, beeline_balance))):
+        driver.implicitly_wait(30)
+        if len(driver.find_elements((By.XPATH, beeline_balance))) < 0:
             balance = 'Произошла ошибка, не удалось узнать баланс'
         else:
-            balance = (driver.find_element(By.XPATH, beeline_balance).text)
+            balance = driver.find_element(By.XPATH, beeline_balance).text
             driver.find_element(By.XPATH, beeline_profile_button).click()
             driver.find_element(By.XPATH, beeline_exit_button).click()
     except Exception as ex:
