@@ -10,10 +10,13 @@ from datetime import time, date
 
 
 
+
 def account_mts(login, password):
     balance = 0
     try:
         driver.get(mts_url)
+        if driver.find_element(By.XPATH, "//title[contains(text(), '403')]"):
+            return "Код ответа 403"
         driver.find_element(By.XPATH, mts_input_login).send_keys(login)
         driver.find_element(By.XPATH, mts_next_button).click()
         driver.find_element(By.XPATH, mts_input_password).send_keys(password)
