@@ -8,107 +8,135 @@ import beepy
 from datetime import time, date
 
 
-def emp():
-    pass
 
 
 def account_mts(login, password):
-    url = 'https://login.mts.ru/amserver/NUI/?service=login-spa&statetrace=21a109bcee8a4a89ac9ed11f8e6a7470&client_id=LK&goto=https%3A%2F%2Flogin.mts.ru%2Famserver%2Foauth2%2Fauthorize%3Fscope%3Dprofile%2520account%2520phone%2520slaves%253Aall%2520slaves%253Aprofile%2520sub%2520email%2520user_address%2520identity_doc%2520lbsv%2520sso%2520openid%26response_type%3Dcode%26client_id%3DLK%26state%3D21a109bcee8a4a89ac9ed11f8e6a7470%26redirect_uri%3Dhttps%253A%252F%252Fauth-lk.ssl.mts.ru%252Faccount%252Fcallback%252Flogin&realm=%2Fusers&utm_referrer=https%3A%2F%2Flk.mts.ru%2F'
     balance = 0
     try:
-        driver.get(url)
-        driver.find_element(By.XPATH, "//input[@id='login']").send_keys(login)
-        driver.find_element(By.XPATH, "//button[contains(text(), 'Далее')]").click()
-        driver.find_element(By.XPATH, "//input[@id='password']").send_keys(password)
-        driver.find_element(By.XPATH, "//button[contains(text(), 'Далее')]")
+        driver.get(mts_url)
+        driver.find_element(By.XPATH, mts_input_login).send_keys(login)
+        driver.find_element(By.XPATH, mts_next_button).click()
+        driver.find_element(By.XPATH, mts_input_password).send_keys(password)
+        driver.find_element(By.XPATH, mts_next_button)
         WebDriverWait(driver, 30).until(
-            ec.presence_of_element_located((By.XPATH, "//span[@class='widget-mobile-balance__value-price']")))
-        if not (ec.presence_of_element_located((By.XPATH, "//span[@class='widget-mobile-balance__value-price']"))):
+            ec.presence_of_element_located((By.XPATH, mts_balance)))
+        if not (ec.presence_of_element_located((By.XPATH, mts_balance))):
             balance = 'Произошла ошибка, не удалось узнать баланс'
         else:
-            balance = (driver.find_element(By.XPATH, "//span[@class='widget-mobile-balance__value-price']").text)
-            driver.find_element(By.XPATH, '//div[starts-with(@class, "prp-profile-widget-container")]').click()
-            driver.find_element(By.XPATH, '//div/span[contains(text(), "Выход")]').click()
-            driver.find_element(By.XPATH, '//div/button[contains(text(), "Выйти")]').click()
+            balance = (driver.find_element(By.XPATH, mts_balance).text)
+            driver.find_element(By.XPATH, mts_profile_button).click()
+            driver.find_element(By.XPATH, mts_exit1_button).click()
+            driver.find_element(By.XPATH, mts_exit2_button).click()
     except Exception as ex:
         print(ex)
         #print(traceback.format_exc())
     finally:
         driver.delete_all_cookies()
         driver.execute_script('window.localStorage.clear();')
-        #driver.close()
         return balance
 
 
 def account_megaphone(login, password):
-    url = "https://lk.megafon.ru/login"
     balance = 0
     try:
-        driver.get(url)
-        driver.find_element(By.XPATH, "//div[contains(text(), 'Вход по паролю')]").click()
-        driver.find_element(By.XPATH, "//input[@class='mfui-text-field__field phone-input__field']").send_keys(login)
-        driver.find_element(By.XPATH, "//input[@class='mfui-text-field__field text-field__input']").send_keys(password)
-        driver.find_element(By.XPATH, "//span[contains(text(), 'Войти')]").click()
-        if ec.presence_of_element_located((By.XPATH, "//input[@data-testid='Captcha-input']")):
+        driver.get(megaphone_url)
+        driver.find_element(By.XPATH, megaphone_authorization_button).click()
+        driver.find_element(By.XPATH, megaphone_login_input).send_keys(login)
+        driver.find_element(By.XPATH, megaphone_password_input).send_keys(password)
+        driver.find_element(By.XPATH, megaphone_enter_button).click()
+        if ec.presence_of_element_located((By.XPATH, megaphone_captcha_input)):
             beepy.beep()
             input("Пройдите капчу и введите 'Enter' в консоль")
-            driver.find_element(By.XPATH, "//input[@class='mfui-text-field__field phone-input__field']").send_keys(login)
-            driver.find_element(By.XPATH, "//input[@class='mfui-text-field__field text-field__input']").send_keys(password)
-            driver.find_element(By.XPATH, "//span[contains(text(), 'Войти')]").click()
-        WebDriverWait(driver, 30).until(ec.presence_of_element_located((By.XPATH,"//h1[@class='mfui-header mfui-header_color_default mfui-header_level_h1 mfui-header_h-align_inherit main-balance-widget__header']")))
-        if not (ec.presence_of_element_located((By.XPATH,"//h1[@class='mfui-header mfui-header_color_default mfui-header_level_h1 mfui-header_h-align_inherit main-balance-widget__header']"))):
+            driver.find_element(By.XPATH, megaphone_login_input).send_keys(login)
+            driver.find_element(By.XPATH, megaphone_password_input).send_keys(password)
+            driver.find_element(By.XPATH, megaphone_enter_button).click()
+        WebDriverWait(driver, 30).until(ec.presence_of_element_located((By.XPATH, megaphone_balance)))
+        if not (ec.presence_of_element_located((By.XPATH,megaphone_balance))):
             balance = 'Произошла ошибка, не удалось узнать баланс'
         else:
-            balance = (driver.find_element(By.XPATH,"//h1[@class='mfui-header mfui-header_color_default mfui-header_level_h1 mfui-header_h-align_inherit main-balance-widget__header']").text)
-            driver.find_element(By.XPATH, '//div/div[@class="ym-header-profile-panel"]').click()
-            driver.find_element(By.XPATH, '//div/button[@data-ym-action="Выйти из Личного кабинета"]').click()
+            balance = (driver.find_element(By.XPATH,megaphone_balance).text)
+            driver.find_element(By.XPATH, megaphone_profile_button).click()
+            driver.find_element(By.XPATH, megaphone_exit_button).click()
     except Exception as ex:
         print(ex)
         #print(traceback.format_exc())
     finally:
         driver.delete_all_cookies()
         driver.execute_script('window.localStorage.clear();')
-        #driver.close()
         return balance
 
 
 def account_beeline(login, password):
-    url = 'https://moskva.beeline.ru/login/'
+
     balance = 0
     try:
-        driver.get(url)
+        driver.get(beeline_url)
         WebDriverWait(driver, 5).until(
-            ec.presence_of_element_located((By.XPATH, "//div/span[contains(text(), 'Логин')]")))
-        if not ec.presence_of_element_located((By.XPATH, "//div/span[contains(text(), 'С постоянным паролем')]")):
-            driver.find_element(By.XPATH, "//div/span[contains(text(), 'С постоянным паролем')]").click()
-            driver.find_element(By.XPATH, "//input[@placeholder='Логин']").send_keys(login)
-            driver.find_element(By.XPATH, "//input[@placeholder='Пароль']").send_keys(password)
+            ec.presence_of_element_located((By.XPATH, beeline_authorization1_button)))
+        if not ec.presence_of_element_located((By.XPATH, beeline_authorization1_button)):
+            driver.find_element(By.XPATH, beeline_authorization2_button).click()
+            driver.find_element(By.XPATH, beeline_login2_input).send_keys(login)
+            driver.find_element(By.XPATH, beeline_password2_input).send_keys(password)
         else:
-            driver.find_element(By.XPATH, "//div/span[contains(text(), 'Логин')]").click()
-            driver.find_element(By.XPATH, "//input[@placeholder='Введите логин']").send_keys(login)
-            driver.find_element(By.XPATH, "//input[@placeholder='Введите пароль']").send_keys(password)
-        driver.find_element(By.XPATH, "//button/span[contains(text(), 'Войти')]").click()
-        if (ec.presence_of_element_located((By.XPATH, "//span[contains(text(), '₽') and @data-component='Text']"))) \
-                or ((ec.presence_of_element_located((By.XPATH, '//input[@placeholder="Символы с картинки"]')))
-                    or (ec.presence_of_element_located((By.XPATH, '//div/img')))):
+            driver.find_element(By.XPATH, beeline_authorization1_button).click()
+            driver.find_element(By.XPATH, beeline_login1_input).send_keys(login)
+            driver.find_element(By.XPATH, beeline_password1_input).send_keys(password)
+        driver.find_element(By.XPATH, beeline_enter_button).click()
+        if ((ec.presence_of_element_located((By.XPATH, beeline_captcha_input))) or (ec.presence_of_element_located((By.XPATH, beeline_captcha_pic)))):
             beepy.beep()
             input("Пройдите капчу и введите 'Enter' в консоль")
-        WebDriverWait(driver, 30).until(ec.presence_of_element_located((By.XPATH, "//span[contains(text(), '₽') and @data-component='Text']")))
-        if not (ec.presence_of_element_located((By.XPATH, "//span[contains(text(), '₽') and @data-component='Text']"))):
+        WebDriverWait(driver, 30).until(ec.presence_of_element_located((By.XPATH, beeline_balance)))
+        if not (ec.presence_of_element_located((By.XPATH, beeline_balance))):
             balance = 'Произошла ошибка, не удалось узнать баланс'
         else:
-            balance = (driver.find_element(By.XPATH, "//span[contains(text(), '₽') and @data-component='Text']").text)
-            driver.find_element(By.XPATH, '//div/button[@data-selector="account__button-desktop"]').click()
-            driver.find_element(By.XPATH, '//div/a/span[contains(text(), "Выйти")]').click()
+            balance = (driver.find_element(By.XPATH, beeline_balance).text)
+            driver.find_element(By.XPATH, beeline_profile_button).click()
+            driver.find_element(By.XPATH, beeline_exit_button).click()
     except Exception as ex:
         print(ex)
         #print(traceback.format_exc())
     finally:
         driver.delete_all_cookies()
         driver.execute_script('window.localStorage.clear();')
-        #driver.close()
         return balance
 
+
+#XPATHs for MTS
+mts_url = 'https://login.mts.ru'
+mts_input_login = "//input[@id='login']"
+mts_input_password = "//input[@id='password']"
+mts_next_button = "//button[contains(text(), 'Далее')]"
+mts_balance = "//span[@class='widget-mobile-balance__value-price']"
+mts_profile_button = '//div[starts-with(@class, "prp-profile-widget-container")]'
+mts_exit1_button = '//div/span[contains(text(), "Выход")]'
+mts_exit2_button = '//div/button[contains(text(), "Выйти")]'
+
+#XPATHs for Megaphone
+megaphone_url = "https://lk.megafon.ru/login"
+megaphone_authorization_button = "//div[contains(text(), 'Вход по паролю')]"
+megaphone_login_input = "//input[@class='mfui-text-field__field phone-input__field']"
+megaphone_password_input = "//input[@class='mfui-text-field__field text-field__input']"
+megaphone_enter_button = "//span[contains(text(), 'Войти')]" 
+megaphone_captcha_input = "//input[@data-testid='Captcha-input']"
+megaphone_balance = "//h1[@class='mfui-header mfui-header_color_default mfui-header_level_h1 mfui-header_h-align_inherit main-balance-widget__header']"
+megaphone_profile_button = '//div/div[@class="ym-header-profile-panel"]'
+megaphone_exit_button = '//div/button[@data-ym-action="Выйти из Личного кабинета"]'
+
+
+#XPATHs for Beeline
+beeline_url = 'https://moskva.beeline.ru/login/'
+beeline_authorization1_button = "//div/span[contains(text(), 'Логин')]"
+beeline_authorization2_button = "//div/span[contains(text(), 'С постоянным паролем')]"
+beeline_login2_input = "//input[@placeholder='Логин']"
+beeline_password2_input = "//input[@placeholder='Пароль']"
+beeline_login1_input = "//input[@placeholder='Введите логин']"
+beeline_password1_input = "//input[@placeholder='Введите пароль']"
+beeline_enter_button = "//button/span[contains(text(), 'Войти')]"
+beeline_captcha_input = '//input[@placeholder="Символы с картинки"]'
+beeline_captcha_pic = '//div/img'
+beeline_balance = "//span[contains(text(), '₽') and @data-component='Text']"
+beeline_profile_button = '//div/button[@data-selector="account__button-desktop"]'
+beeline_exit_button = '//div/a/span[contains(text(), "Выйти")]'
 
 if __name__ == "__main__":
     driver = webdriver.Edge()
@@ -144,8 +172,3 @@ if __name__ == "__main__":
         databasa.to_excel(writer, sheet_name=f'{date.today()}', index=False)
 
 
-    # cache clearing commands
-    # window.localStorage.clear()
-    # window.sessionStorage.clear()
-    # driver.delete_all_cookies()
-    # — disk-cache-size=0
