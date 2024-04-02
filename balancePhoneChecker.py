@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 import pandas as pd
 import beepy
+import undetected_chromedriver as uc
 from datetime import time, date
 
 
@@ -15,14 +16,15 @@ def account_mts(login, password):
     balance = 0
     try:
         driver.get(mts_url)
-        if driver.find_element(By.XPATH, "//title[contains(text(), '403')]"):
+        driver.implicitly_wait(2)
+        if len(driver.find_elements(By.XPATH, "//title[contains(text(), '403')]")) > 0:
             return "Код ответа 403"
+        else:
+            driver.implicitly_wait(30)
         driver.find_element(By.XPATH, mts_input_login).send_keys(login)
         driver.find_element(By.XPATH, mts_next_button).click()
         driver.find_element(By.XPATH, mts_input_password).send_keys(password)
         driver.find_element(By.XPATH, mts_next_button)
-        WebDriverWait(driver, 30).until(
-            ec.presence_of_element_located((By.XPATH, mts_balance)))
         if not (ec.presence_of_element_located((By.XPATH, mts_balance))):
             balance = 'Произошла ошибка, не удалось узнать баланс'
         else:
@@ -53,7 +55,6 @@ def account_megaphone(login, password):
             driver.find_element(By.XPATH, megaphone_login_input).send_keys(login)
             driver.find_element(By.XPATH, megaphone_password_input).send_keys(password)
             driver.find_element(By.XPATH, megaphone_enter_button).click()
-        WebDriverWait(driver, 30).until(ec.presence_of_element_located((By.XPATH, megaphone_balance)))
         if not (ec.presence_of_element_located((By.XPATH,megaphone_balance))):
             balance = 'Произошла ошибка, не удалось узнать баланс'
         else:
@@ -88,7 +89,6 @@ def account_beeline(login, password):
         if ((ec.presence_of_element_located((By.XPATH, beeline_captcha_input))) or (ec.presence_of_element_located((By.XPATH, beeline_captcha_pic)))):
             beepy.beep()
             input("Пройдите капчу и введите 'Enter' в консоль")
-        WebDriverWait(driver, 30).until(ec.presence_of_element_located((By.XPATH, beeline_balance)))
         if not (ec.presence_of_element_located((By.XPATH, beeline_balance))):
             balance = 'Произошла ошибка, не удалось узнать баланс'
         else:
@@ -142,7 +142,8 @@ beeline_profile_button = '//div/button[@data-selector="account__button-desktop"]
 beeline_exit_button = '//div/a/span[contains(text(), "Выйти")]'
 
 if __name__ == "__main__":
-    driver = webdriver.Edge()
+    # driver = webdriver.Chrome()
+    driver = uc.Chrome()
     driver.maximize_window()
     driver.implicitly_wait(30)
     data_file = "test.xlsx"
